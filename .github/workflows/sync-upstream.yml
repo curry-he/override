@@ -26,7 +26,7 @@ jobs:
 
       - name: Sync upstream changes
         id: sync
-        uses:  jamesives/github-action-sync-fork@dev
+        uses:  aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
           exclude: ./github/workflows/
           upstream_sync_repo: linux-do/override
