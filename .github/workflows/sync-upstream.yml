@@ -28,6 +28,7 @@ jobs:
         id: sync
         uses:  jamesives/github-action-sync-fork@v4
         with:
+          exclude: ./github/workflows/
           upstream_sync_repo: linux-do/override
           upstream_sync_branch: master
           target_sync_branch: master
