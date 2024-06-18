@@ -1,76 +1,46 @@
-            - name: Repo File Sync Action
-  # You may pin to the exact commit or the version.
-  # uses: BetaHuhn/repo-file-sync-action@8b92be3375cf1d1b0cd579af488a9255572e4619
-  uses: BetaHuhn/repo-file-sync-action@v1.21.1
-  with:
-    # GitHub Personal Access Token to use to get repos and write secrets
+name: Upstream Sync
 
-    GH_PAT: # optional
-    # GitHub App Installation Token to used to access repos
+permissions:
+  contents: write
+  issues: write
+  actions: write
 
-    GH_INSTALLATION_TOKEN: # optional
-    # The path for the sync configuration file
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
+  workflow_dispatch:
 
-    CONFIG_PATH: # optional
-    # Label GH_PAT as a fine grained token
+jobs:
+  sync_latest_from_upstream:
+    name: Sync latest commits from upstream repo
+    runs-on: ubuntu-latest
 
-    IS_FINE_GRAINED: # optional
-    # Labels which will be added to the pull request. Defaults to sync. Set to false to turn off
+    steps:
+      - uses: actions/checkout@v4
 
-    PR_LABELS: # optional
-    # Additional content to add in the PR description. Defaults to ''
+      - name: Clean issue notice
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'close-issues'
+          labels: '🚨 Sync Fail'
 
-    PR_BODY: # optional
-    # Users to assign to the pull request. Defaults to none
+      - name: Sync upstream changes
+        id: sync
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          upstream_sync_repo: linux-do/override
+          upstream_sync_branch: master
+          target_sync_branch: master
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }} # automatically generated, no need to set
+          test_mode: false
 
-    ASSIGNEES: # optional
-    # Users to request a review of the pull request from. Defaults to none
-
-    REVIEWERS: # optional
-    # Teams to request a review of the pull request from. Defaults to none
-
-    TEAM_REVIEWERS: # optional
-    # Prefix for commit message and pull request title. Defaults to 🔄
-
-    COMMIT_PREFIX: # optional
-    # Commit message body. Will be appended to commit message, separated by two line returns. Defaults to ''
-
-    COMMIT_BODY: # optional
-    # Commit each file seperately. Defaults to true
-
-    COMMIT_EACH_FILE: # optional
-    # The e-mail address used to commit the synced files. Defaults to the email of the GitHub PAT
-
-    GIT_EMAIL: # optional
-    # The username used to commit the synced files. Defaults to the username of the GitHub PAT
-
-    GIT_USERNAME: # optional
-    # The working directory where all sync operations will be done. Defaults to `tmp-${Date.now().toString()}`
-
-    TMP_DIR: # optional
-    # Run everything except for nothing will be updated. Defaults to false
-
-    DRY_RUN: # optional
-    # Skip removing the temporary directory (useful for debugging). Defaults to false
-
-    SKIP_CLEANUP: # optional
-    # Overwrite any existing Sync PR with the new changes. Defaults to true
-
-    OVERWRITE_EXISTING_PR: # optional
-    # Re-use the original commit message for commits. Works only if the action is triggered by pushing one commit. Defaults to false
-
-    ORIGINAL_MESSAGE: # optional
-    # Re-use the commit message as PR title. Works only if ORIGINAL_MESSAGE is on and PR has one commit. Defaults to false
-
-    COMMIT_AS_PR_TITLE: # optional
-    # Skips creating a Pull Request and pushes directly to the default branch. Defaults to false
-
-    SKIP_PR: # optional
-    # Specify a different prefix for the new branch in the target repo. Defaults to repo-sync/SOURCE_REPO_NAME
-
-    BRANCH_PREFIX: # optional
-    # Specify the user account that will be used in a fork and pull-request workflow. Defaults
-false.
-
-    FORK: # optional
-          
+      - name: Sync check
+        if: failure()
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'create-issue'
+          title: '🚨 同步失败 | Sync Fail'
+          labels: '🚨 Sync Fail'
+          body: |
+            同步失败，请手动同步
+            
