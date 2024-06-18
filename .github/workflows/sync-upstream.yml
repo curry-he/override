@@ -43,5 +43,7 @@ jobs:
           title: '🚨 同步失败 | Sync Fail'
           labels: '🚨 Sync Fail'
           body: |
-            同步失败，请手动同步
+            由于 [chatgpt-web-midjourney-proxy][upstream_repo] 上游仓库的 workflow 文件变更，导致 GitHub 自动暂停了本次自动更新，你需要手动 Sync Fork 一次，请查看 [详细教程][tutorial-zh-CN]
+            Due to a change in the workflow file of the [chatgpt-web-midjourney-proxy][upstream_repo] upstream repository, GitHub has automatically suspended the scheduled automatic update. You need to manually sync your fork. Please refer to the detailed [Tutorial][tutorial-en-US] for instructions.
+
             
