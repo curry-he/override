@@ -26,7 +26,7 @@ jobs:
 
       - name: Sync upstream changes
         id: sync
-        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        uses:  jamesives/github-action-sync-fork@v4
         with:
           upstream_sync_repo: linux-do/override
           upstream_sync_branch: master
